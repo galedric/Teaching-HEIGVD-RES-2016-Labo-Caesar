@@ -4,10 +4,13 @@ import ch.heigvd.res.caesar.protocol.CipherInputStream;
 import ch.heigvd.res.caesar.protocol.CipherOutputStream;
 import ch.heigvd.res.caesar.protocol.Protocol;
 import ch.heigvd.res.caesar.protocol.frame.*;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import sun.plugin.dom.exception.InvalidStateException;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Random;
 
@@ -60,8 +63,8 @@ public class ClientThread extends Thread {
                             protocolError();
                         }
 
-                        long publicKey = (long) Math.pow(Protocol.g, serverKey) % Protocol.p;
-                        ServerHelloFrame server = new ServerHelloFrame(client.version, Protocol.g, Protocol.p, publicKey);
+                        BigInteger publicKey = BigInteger.valueOf(Protocol.g).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p));
+                        ServerHelloFrame server = new ServerHelloFrame(client.version, Protocol.g, Protocol.p, publicKey.intValue());
                         send(server);
 
                         // Si tout ok
@@ -77,7 +80,7 @@ public class ClientThread extends Thread {
                         KeyFrame key = KeyFrame.unserialize(frame);
 
                         // Chiffrement
-                        int k = (int)Math.pow(serverKey, key.clientKey) % Protocol.p;
+                        int k = BigInteger.valueOf(serverKey).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p)).intValue();
                         cipherInput.setKey(k);
                         cipherOutput.setKey(k);
 

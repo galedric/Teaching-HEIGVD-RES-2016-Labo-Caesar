@@ -6,6 +6,7 @@ import ch.heigvd.res.caesar.protocol.Protocol;
 import ch.heigvd.res.caesar.protocol.frame.*;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Random;
@@ -63,8 +64,8 @@ public class CaesarClient {
                         Random r = new Random();
                         int clientKey = r.nextInt() % Protocol.bound + 2;
 
-                        long publicKey = (long) Math.pow(serv.g, clientKey) % serv.p;
-                        long k = (long) Math.pow(publicKey, serv.serverKey) % Protocol.p;
+                        BigInteger publicKey = BigInteger.valueOf(serv.g).modPow(BigInteger.valueOf(clientKey), BigInteger.valueOf(serv.p));
+                        int k = publicKey.modPow(BigInteger.valueOf(serv.serverKey), BigInteger.valueOf(serv.p)).intValue();
 
                         send(new KeyFrame(clientKey));
 

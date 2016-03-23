@@ -10,13 +10,13 @@ public class ServerHelloFrame extends Frame {
 	public final short version;
 	public final int g;
 	public final int p;
-	public final long serverKey;
+	public final int serverKey;
 
-	public ServerHelloFrame(int g, int p, long serverKey) {
+	public ServerHelloFrame(int g, int p, int serverKey) {
 		this(Protocol.VERSION, g, p, serverKey);
 	}
 
-	public ServerHelloFrame(short version, int g, int p, long serverKey) {
+	public ServerHelloFrame(short version, int g, int p, int serverKey) {
 		this.version = version;
 		this.g = g;
 		this.p = p;
@@ -29,7 +29,7 @@ public class ServerHelloFrame extends Frame {
 		fb.writeShort(version);
 		fb.writeInt(g);
 		fb.writeInt(p);
-		fb.writeLong(serverKey);
+		fb.writeInt(serverKey);
 		return fb.getFrameBuffer();
 	}
 
@@ -38,7 +38,7 @@ public class ServerHelloFrame extends Frame {
 		short version = fr.readShort();
 		int g = fr.readInt();
 		int p = fr.readInt();
-		long serverKey = fr.readLong();
+		int serverKey = fr.readInt();
 		return new ServerHelloFrame(version, g, p, serverKey);
 	}
 }
