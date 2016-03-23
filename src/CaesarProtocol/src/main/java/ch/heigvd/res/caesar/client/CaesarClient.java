@@ -17,7 +17,6 @@ public class CaesarClient {
   public static void main(String[] args) {
     System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tH:%1$tM:%1$tS::%1$tL] Client > %5$s%n");
     LOG.info("Caesar client starting...");
-    LOG.info("Protocol constant: " + Protocol.A_CONSTANT_SHARED_BY_CLIENT_AND_SERVER);
+    LOG.info("Protocol constant: " + Protocol.HELLO);
   }
-  
 }
