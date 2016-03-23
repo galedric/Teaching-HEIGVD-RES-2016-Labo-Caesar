@@ -10,43 +10,46 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Olivier Liechti (olivier.liechti@heig-vd.ch)
  */
 public class CaesarServer {
 
-  private static final Logger LOG = Logger.getLogger(CaesarServer.class.getName());
-  private static LinkedList<Socket> sockets;
+    private static final Logger LOG = Logger.getLogger(CaesarServer.class.getName());
+    private static LinkedList<Socket> sockets;
 
-  /**
-   * @param args the command line arguments
-   */
-  public static void main(String[] args) {
-    //System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tH:%1$tM:%1$tS::%1$tL] Server > %5$s%n");
-    //LOG.info("Caesar server starting...");
-    //LOG.info("Protocol constant: " + Protocol.CLIENT_HELLO);
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        //System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tH:%1$tM:%1$tS::%1$tL] Server > %5$s%n");
+        //LOG.info("Caesar server starting...");
+        //LOG.info("Protocol constant: " + Protocol.CLIENT_HELLO);
 
-    Socket socket;
-    sockets = new LinkedList();
+        Socket socket;
+        sockets = new LinkedList();
 
-    try {
-      ServerSocket serverSocket = new ServerSocket(2303);
+        try {
+            ServerSocket serverSocket = new ServerSocket(2303);
 
-      while(true) {
-        socket = serverSocket.accept();
+            while (true) {
+                socket = serverSocket.accept();
 
-        sockets.add(socket);
+                sockets.add(socket);
 
-      }
-
-    }catch(IOException e){
-      e.printStackTrace();
+                new ClientThread(socket).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-  }
 
-  public void broadcast(/*Frame frame*/){
-    for(Socket s : sockets){
-      s.getOutputStream().write(/*frame.serialize()*/);
+    public static void broadcast(/*Frame frame*/) {
+        for (Socket s : sockets) {
+            try {
+                s.getOutputStream().write(/*frame.serialize()*/);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
-  }
 }
