@@ -1,9 +1,7 @@
 package ch.heigvd.res.caesar.protocol.frame;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.io.IOException;
 
 abstract public class Frame {
-	abstract public byte[] serialize();
-
+	abstract public byte[] serialize() throws IOException;
 }
