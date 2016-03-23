@@ -54,8 +54,6 @@ public class CaesarClient {
 
                 input.readFully(frame);
 
-                System.out.println("Got: " + frame[0] + "; Length = " + frameLength);
-
                 switch (frame[0]) {
                     case Protocol.SERVER_HELLO:
 
@@ -69,8 +67,8 @@ public class CaesarClient {
 
                         send(new KeyFrame(clientKey));
 
-                        cipherInput.setKey(k);
-                        cipherOutput.setKey(k);
+                        //cipherInput.setKey(k);
+                        //cipherOutput.setKey(k);
 
                         state = State.LOGIN;
 
