@@ -7,7 +7,7 @@ import ch.heigvd.res.caesar.protocol.Protocol;
 import java.io.IOException;
 
 public class SendFrame extends Frame {
-	private final String message;
+	public final String message;
 
 	public SendFrame(String message) {
 		this.message = message;
@@ -15,13 +15,13 @@ public class SendFrame extends Frame {
 
 	@Override
 	public byte[] serialize() throws IOException {
-		FrameBuilder fb = new FrameBuilder(Protocol.MESSAGE);
+		FrameBuilder fb = new FrameBuilder(Protocol.SEND);
 		fb.writeString(message);
 		return fb.getFrameBuffer();
 	}
 
 	public static SendFrame unserialize(byte[] frame) throws IOException {
-		FrameReader fr = new FrameReader(frame, Protocol.MESSAGE);
+		FrameReader fr = new FrameReader(frame, Protocol.SEND);
 		String message = fr.readString();
 		return new SendFrame(message);
 	}

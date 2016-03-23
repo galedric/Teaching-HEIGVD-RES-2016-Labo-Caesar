@@ -10,13 +10,13 @@ public class ServerHelloFrame extends Frame {
 	public final short version;
 	public final int g;
 	public final int p;
-	public final int serverKey;
+	public final long serverKey;
 
-	public ServerHelloFrame(int g, int p, int serverKey) {
+	public ServerHelloFrame(int g, int p, long serverKey) {
 		this(Protocol.VERSION, g, p, serverKey);
 	}
 
-	public ServerHelloFrame(short version, int g, int p, int serverKey) {
+	public ServerHelloFrame(short version, int g, int p, long serverKey) {
 		this.version = version;
 		this.g = g;
 		this.p = p;
@@ -25,20 +25,20 @@ public class ServerHelloFrame extends Frame {
 
 	@Override
 	public byte[] serialize() throws IOException {
-		FrameBuilder fb = new FrameBuilder(Protocol.MESSAGE);
+		FrameBuilder fb = new FrameBuilder(Protocol.SERVER_HELLO);
 		fb.writeShort(version);
 		fb.writeInt(g);
 		fb.writeInt(p);
-		fb.writeInt(serverKey);
+		fb.writeLong(serverKey);
 		return fb.getFrameBuffer();
 	}
 
 	public static ServerHelloFrame unserialize(byte[] frame) throws IOException {
-		FrameReader fr = new FrameReader(frame, Protocol.MESSAGE);
+		FrameReader fr = new FrameReader(frame, Protocol.SERVER_HELLO);
 		short version = fr.readShort();
 		int g = fr.readInt();
 		int p = fr.readInt();
-		int serverKey = fr.readInt();
+		long serverKey = fr.readLong();
 		return new ServerHelloFrame(version, g, p, serverKey);
 	}
 }

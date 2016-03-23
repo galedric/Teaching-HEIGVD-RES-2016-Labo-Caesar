@@ -5,17 +5,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class CipherOutputStream extends FilterOutputStream {
-	private int delta = 0;
+	private long delta = 0;
 
 	public CipherOutputStream(OutputStream out) {
 		super(out);
 	}
 
-	public void setKey(int delta) {
+	public void setKey(long delta) {
 		this.delta = delta;
 	}
 
 	public void write(int b) throws IOException {
-		out.write(b + delta);
+		out.write((int)(b + delta));
 	}
 }

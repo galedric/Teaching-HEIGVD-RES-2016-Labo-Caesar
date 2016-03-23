@@ -2,6 +2,7 @@ package ch.heigvd.res.caesar.server;
 
 import ch.heigvd.res.caesar.client.*;
 import ch.heigvd.res.caesar.protocol.Protocol;
+import ch.heigvd.res.caesar.protocol.frame.Frame;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 public class CaesarServer {
 
     private static final Logger LOG = Logger.getLogger(CaesarServer.class.getName());
-    private static LinkedList<Socket> sockets;
+    private static LinkedList<ClientThread> threads;
 
     /**
      * @param args the command line arguments
@@ -26,30 +27,42 @@ public class CaesarServer {
         //LOG.info("Protocol constant: " + Protocol.CLIENT_HELLO);
 
         Socket socket;
-        sockets = new LinkedList();
+        threads = new LinkedList();
 
         try {
             ServerSocket serverSocket = new ServerSocket(2303);
 
             while (true) {
-                socket = serverSocket.accept();
+                ClientThread n = new ClientThread(serverSocket.accept());
+                threads.add(n);
+                n.start();
 
-                sockets.add(socket);
-
-                new ClientThread(socket).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void broadcast(/*Frame frame*/) {
-        for (Socket s : sockets) {
-            try {
-                s.getOutputStream().write(/*frame.serialize()*/);
-            } catch (IOException e) {
-                e.printStackTrace();
+    public static void broadcast(Frame frame) throws IOException {
+        for (ClientThread c : threads) {
+            c.send(frame);
+        }
+    }
+
+    public static boolean checkUsername(String username){
+        for (ClientThread c : threads) {
+            if(username == null)
+                continue;
+
+            if(username.equals(c.getUsername())){
+                return false;
             }
         }
+
+        return true;
+    }
+
+    public static int numClients(){
+        return threads.size();
     }
 }

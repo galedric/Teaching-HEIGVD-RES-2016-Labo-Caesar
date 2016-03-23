@@ -14,4 +14,8 @@ public class Protocol {
 	public static final byte LOGIN = 0x10;
 	public static final byte LOGIN_OK = 0x15;
 	public static final byte LOGIN_FAIL = 0x1F;
+
+	public static final int g = 5;
+	public static final int p = 251;
+	public static final int bound = 10;
 }

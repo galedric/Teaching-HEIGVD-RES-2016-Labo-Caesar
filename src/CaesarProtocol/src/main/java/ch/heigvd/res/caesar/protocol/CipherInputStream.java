@@ -5,19 +5,19 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CipherInputStream extends FilterInputStream {
-	private int delta = 0;
+	private long delta = 0;
 
 	public CipherInputStream(InputStream in) {
 		super(in);
 	}
 
-	public void setKey(int delta) {
+	public void setKey(long delta) {
 		this.delta = delta;
 	}
 
 	@Override
 	public int read() throws IOException {
-		return (in.read() - delta) % 256;
+		return (int)((in.read() - delta) % 256L);
 	}
 
 	@Override

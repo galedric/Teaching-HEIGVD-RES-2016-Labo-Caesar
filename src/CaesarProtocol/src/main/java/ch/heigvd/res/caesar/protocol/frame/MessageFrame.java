@@ -7,8 +7,8 @@ import ch.heigvd.res.caesar.protocol.Protocol;
 import java.io.IOException;
 
 public class MessageFrame extends Frame {
-	private final String author;
-	private final String message;
+	public final String author;
+	public final String message;
 
 	public MessageFrame(String author, String message) {
 		this.author = author;
