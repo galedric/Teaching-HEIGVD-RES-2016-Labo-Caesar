@@ -36,7 +36,7 @@ public class ClientThread extends Thread {
             output = new DataOutputStream(cipherOutput);
 
             Random r = new Random();
-            serverKey = r.nextInt() % Protocol.bound + 2;
+            serverKey = Math.abs(r.nextInt()) % Protocol.bound + 2;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,7 +64,7 @@ public class ClientThread extends Thread {
                         }
 
                         BigInteger publicKey = BigInteger.valueOf(Protocol.g).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p));
-                        ServerHelloFrame server = new ServerHelloFrame(client.version, Protocol.g, Protocol.p, publicKey.intValue());
+                        ServerHelloFrame server = new ServerHelloFrame(client.version, Protocol.g, Protocol.p, publicKey.intValueExact());
                         send(server);
 
                         // Si tout ok
@@ -80,7 +80,9 @@ public class ClientThread extends Thread {
                         KeyFrame key = KeyFrame.unserialize(frame);
 
                         // Chiffrement
-                        int k = BigInteger.valueOf(serverKey).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p)).intValue();
+                        int k = BigInteger.valueOf(key.clientKey).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p)).intValueExact();
+                        System.out.println("Key: " + k);
+
                         cipherInput.setKey(k);
                         cipherOutput.setKey(k);
 
@@ -103,12 +105,10 @@ public class ClientThread extends Thread {
                         }
 
                         send(new LoginOkFrame(CaesarServer.numClients()));
-
                         username = log.username;
 
                         // Si tout ok
                         state = State.READY;
-
                         break;
 
                     case Protocol.SEND:
@@ -123,6 +123,14 @@ public class ClientThread extends Thread {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+
+                CaesarServer.removeClient(this);
+
+                try {
+                    socket.close();
+                }catch(IOException i){}
+
+
             }
         }
     }

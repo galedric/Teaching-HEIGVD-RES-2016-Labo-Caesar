@@ -62,6 +62,10 @@ public class CaesarServer {
         return true;
     }
 
+    public static void removeClient(ClientThread client){
+        threads.remove(client);
+    }
+
     public static int numClients(){
         return threads.size();
     }

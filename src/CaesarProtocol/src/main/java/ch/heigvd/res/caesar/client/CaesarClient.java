@@ -60,15 +60,18 @@ public class CaesarClient {
                         ServerHelloFrame serv = ServerHelloFrame.unserialize(frame);
 
                         Random r = new Random();
-                        int clientKey = r.nextInt() % Protocol.bound + 2;
+                        int clientKey = Math.abs(r.nextInt()) % Protocol.bound + 2;
 
                         BigInteger publicKey = BigInteger.valueOf(serv.g).modPow(BigInteger.valueOf(clientKey), BigInteger.valueOf(serv.p));
-                        int k = publicKey.modPow(BigInteger.valueOf(serv.serverKey), BigInteger.valueOf(serv.p)).intValue();
 
-                        send(new KeyFrame(clientKey));
+                        int k = BigInteger.valueOf(serv.serverKey).modPow(BigInteger.valueOf(clientKey), BigInteger.valueOf(serv.p)).intValueExact();
 
-                        //cipherInput.setKey(k);
-                        //cipherOutput.setKey(k);
+                        System.out.println("Key: " + k);
+
+                        send(new KeyFrame(publicKey.intValueExact()));
+
+                        cipherInput.setKey(k);
+                        cipherOutput.setKey(k);
 
                         state = State.LOGIN;
 
