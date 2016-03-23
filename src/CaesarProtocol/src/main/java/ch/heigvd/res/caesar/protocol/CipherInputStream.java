@@ -17,7 +17,12 @@ public class CipherInputStream extends FilterInputStream {
 
 	@Override
 	public int read() throws IOException {
-		return (int) Math.floorMod(in.read() - delta, 256);
+		long r = in.read() - delta;
+		if (r < 0) {
+			return (int) (r + 256);
+		} else {
+			return (int) (r % 256);
+		}
 	}
 
 	@Override
