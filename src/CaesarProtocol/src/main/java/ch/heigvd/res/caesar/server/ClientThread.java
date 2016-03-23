@@ -81,7 +81,6 @@ public class ClientThread extends Thread {
 
                         // Chiffrement
                         int k = BigInteger.valueOf(key.clientKey).modPow(BigInteger.valueOf(serverKey), BigInteger.valueOf(Protocol.p)).intValueExact();
-                        System.out.println("Key: " + k);
 
                         cipherInput.setKey(k);
                         cipherOutput.setKey(k);
@@ -107,6 +106,8 @@ public class ClientThread extends Thread {
                         send(new LoginOkFrame(CaesarServer.numClients()));
                         username = log.username;
 
+                        CaesarServer.broadcast(new MessageFrame("-SERV-", username + " has joined."));
+
                         // Si tout ok
                         state = State.READY;
                         break;
@@ -121,16 +122,22 @@ public class ClientThread extends Thread {
 
                         break;
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
 
                 CaesarServer.removeClient(this);
 
+                if(username != null){
+                    try {
+                        CaesarServer.broadcast(new MessageFrame("-SERV-", username + " has left."));
+                    } catch (IOException o){}
+                }
+
                 try {
                     socket.close();
-                }catch(IOException i){}
+                } catch (IOException i) {}
 
-
+                return;
             }
         }
     }
@@ -146,7 +153,7 @@ public class ClientThread extends Thread {
         socket.close();
 
         // Etc...
-        throw new InvalidStateException("");
+        throw new InvalidStateException("Error");
     }
 
     public String getUsername() {
@@ -155,5 +162,9 @@ public class ClientThread extends Thread {
 
     public OutputStream getOutputStream() {
         return output;
+    }
+
+    public boolean isReady(){
+        return (state == State.READY);
     }
 }

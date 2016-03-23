@@ -4,6 +4,7 @@ import ch.heigvd.res.caesar.protocol.CipherInputStream;
 import ch.heigvd.res.caesar.protocol.CipherOutputStream;
 import ch.heigvd.res.caesar.protocol.Protocol;
 import ch.heigvd.res.caesar.protocol.frame.*;
+import sun.plugin.dom.exception.InvalidStateException;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -47,7 +48,6 @@ public class CaesarClient {
             ClientHelloFrame client = new ClientHelloFrame(Protocol.VERSION);
             send(client);
 
-
             while (true) {
                 int frameLength = input.readInt();
                 byte[] frame = new byte[frameLength];
@@ -56,6 +56,9 @@ public class CaesarClient {
 
                 switch (frame[0]) {
                     case Protocol.SERVER_HELLO:
+                        if(state != State.WAITING_HELLO){
+                            protocolError();
+                        }
 
                         ServerHelloFrame serv = ServerHelloFrame.unserialize(frame);
 
@@ -63,10 +66,7 @@ public class CaesarClient {
                         int clientKey = Math.abs(r.nextInt()) % Protocol.bound + 2;
 
                         BigInteger publicKey = BigInteger.valueOf(serv.g).modPow(BigInteger.valueOf(clientKey), BigInteger.valueOf(serv.p));
-
                         int k = BigInteger.valueOf(serv.serverKey).modPow(BigInteger.valueOf(clientKey), BigInteger.valueOf(serv.p)).intValueExact();
-
-                        System.out.println("Key: " + k);
 
                         send(new KeyFrame(publicKey.intValueExact()));
 
@@ -80,12 +80,19 @@ public class CaesarClient {
                         break;
 
                     case Protocol.LOGIN_FAIL:
+                        if(state != State.LOGIN){
+                            protocolError();
+                        }
+
                         LoginFailFrame fail = LoginFailFrame.unserialize(frame);
                         System.err.println(fail.message);
                         performLogin();
                         break;
 
                     case Protocol.LOGIN_OK:
+                        if(state != State.LOGIN){
+                            protocolError();
+                        }
 
                         LoginOkFrame ok = LoginOkFrame.unserialize(frame);
 
@@ -112,6 +119,10 @@ public class CaesarClient {
 
 
                     case Protocol.MESSAGE:
+                        if(state != State.READY){
+                            protocolError();
+                        }
+
                         MessageFrame message = MessageFrame.unserialize(frame);
                         System.out.println("[" + message.author + "] " + message.message);
 
@@ -135,5 +146,9 @@ public class CaesarClient {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         send(new LoginFrame(reader.readLine()));
+    }
+
+    public static void protocolError() throws IOException {
+        throw new InvalidStateException("Error");
     }
 }

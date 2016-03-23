@@ -45,16 +45,18 @@ public class CaesarServer {
 
     public static void broadcast(Frame frame) throws IOException {
         for (ClientThread c : threads) {
-            c.send(frame);
+            if (c.isReady()) {
+                c.send(frame);
+            }
         }
     }
 
-    public static boolean checkUsername(String username){
+    public static boolean checkUsername(String username) {
         for (ClientThread c : threads) {
-            if(username == null)
+            if (username == null)
                 continue;
 
-            if(username.equals(c.getUsername())){
+            if (username.equals(c.getUsername())) {
                 return false;
             }
         }
@@ -62,11 +64,11 @@ public class CaesarServer {
         return true;
     }
 
-    public static void removeClient(ClientThread client){
+    public static void removeClient(ClientThread client) {
         threads.remove(client);
     }
 
-    public static int numClients(){
+    public static int numClients() {
         return threads.size();
     }
 }
