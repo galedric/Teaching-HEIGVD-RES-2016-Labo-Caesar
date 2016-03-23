@@ -16,6 +16,6 @@ public class CipherOutputStream extends FilterOutputStream {
 	}
 
 	public void write(int b) throws IOException {
-		out.write((int)(b + delta));
+		out.write((int)((b + delta) % 256L));
 	}
 }
